@@ -79,6 +79,18 @@ public class MainWindowViewModel : ViewModelBase
                 File.WriteAllText(file, "");
             }
         }
+
+        ProductLines.CollectionChanged += ProductLines_CollectionChanged;
+    }
+
+    private void ProductLines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+        {
+            int modelRangeCount = MatchedModelRanges.Sum(mr => mr.ChildCount);
+            double progress = (double)(modelRangeCount + IgnoredProducts.Count) / ProductLines.Count;
+            Title = $"Осталось {ProductLines.Count} ({progress:P0}) | Обьеденено: {modelRangeCount} | Игнор: {IgnoredProducts.Count}";
+        }
     }
 
     private void SelectByPattern(object obj)
@@ -168,21 +180,21 @@ public class MainWindowViewModel : ViewModelBase
         string[] alreadyAddedProducts = MatchedModelRanges.SelectMany(p => p.AdjacentIds).Distinct().ToArray();
 
         ProductLines.Clear();
-        File.ReadAllLines(productsFile)
+        var parsedLines = File.ReadAllLines(productsFile)
             .Select(line => ProductLine.Parse(line))
             .Where(line => !alreadyAddedProducts.Contains(line.ProductId) && !ignoredProducts.Contains(line.ProductId))
-            .ToList()
-            .ForEach(line =>
+            .ToArray();
+
+        foreach (var line in parsedLines)
+        {
+            ProductLines.Add(line);
+            line.OnRemoveClicked += () =>
             {
-                ProductLines.Add(line);
-                line.OnRemoveClicked += () =>
-                {
-                    IgnoredProducts.Add(line);
-                    ProductLines.Remove(line);
-                    File.AppendAllLines(ignoreProductsFile, new string[] { line.ProductId });
-                };
-            }
-            );
+                IgnoredProducts.Add(line);
+                ProductLines.Remove(line);
+                File.AppendAllLines(ignoreProductsFile, new string[] { line.ProductId });
+            };
+        }
     }
 
 }

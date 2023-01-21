@@ -14,10 +14,12 @@ public class ProductLine : ViewModelBase
     public string Image { get; set; }
 
     public ICommand RemoveItemCommand { get; set; }
+    public ICommand ToggleCheckStateCommand { get; set; }
 
     public ProductLine()
     {
         RemoveItemCommand = new LambdaCommand(e => OnRemoveClicked?.Invoke());
+        ToggleCheckStateCommand = new LambdaCommand(e => IsChecked = !IsChecked);
     }
 
     public string ImageFullPath => $"https://etk-komplekt.ru/image/{Image}";
@@ -39,9 +41,9 @@ public class ProductLine : ViewModelBase
             {
                 ProductId = arr[0],
                 Model = arr[1],
-                Sku = arr[3],
-                Name = arr[4],
-                Image = arr[5]
+                Sku = arr[2],
+                Name = arr[3],
+                Image = arr[4]
             };
         }
         throw new FormatException(nameof(str));
