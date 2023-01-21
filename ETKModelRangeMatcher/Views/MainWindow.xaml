@@ -6,6 +6,7 @@
     xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:ETKModelRangeMatcher.ViewModels"
+    xmlns:vwp="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
     Title="{Binding Title}"
     Width="781"
     Height="235"
@@ -54,7 +55,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl
+                <vwp:VirtualizingItemsControl 
+                    VirtualizingPanel.CacheLengthUnit="Item" 
+                    VirtualizingPanel.ScrollUnit="Pixel" 
+                    VirtualizingPanel.VirtualizationMode="Recycling"
                     BorderBrush="#333"
                     BorderThickness="1"
                     ItemsSource="{Binding ProductLines}">
@@ -118,10 +122,10 @@
                     </ItemsControl.ItemTemplate>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel IsItemsHost="True" />
+                            <vwp:VirtualizingWrapPanel Orientation="Vertical" SpacingMode="None" StretchItems="False"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-                </ItemsControl>
+                </vwp:VirtualizingItemsControl>
 
                 <Expander Grid.Column="1" IsExpanded="False">
                     <ItemsControl ItemsSource="{Binding MatchedModelRanges}">
