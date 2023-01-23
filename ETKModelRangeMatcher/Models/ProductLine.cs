@@ -33,7 +33,7 @@ public class ProductLine : ViewModelBase
 
     public static ProductLine Parse(string str)
     {
-        var arr = str.Split(new string[] { "\t" }, System.StringSplitOptions.RemoveEmptyEntries);
+        var arr = str.Split(new string[] { "\t" }, System.StringSplitOptions.None);
 
         if (arr.Length == 5)
         {

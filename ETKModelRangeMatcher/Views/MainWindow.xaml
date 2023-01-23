@@ -41,6 +41,9 @@
             <Button Command="{Binding LoadSourceCommand}" ToolTip="Загрузить файл">
                 <icons:PackIconFontAwesome Kind="FileDownloadSolid" />
             </Button>
+            <Button Command="{Binding GetModelRangesDescriptionCommand}" ToolTip="Создать SQL на описание для пустых модельных рядов состоящее из названий adjacent товаров">
+                <icons:PackIconFontAwesome Kind="_500pxBrands" />
+            </Button>
         </StackPanel>
 
         <Border
@@ -55,24 +58,25 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <vwp:VirtualizingItemsControl 
-                    VirtualizingPanel.CacheLengthUnit="Item" 
-                    VirtualizingPanel.ScrollUnit="Pixel" 
-                    VirtualizingPanel.VirtualizationMode="Recycling"
+                <vwp:VirtualizingItemsControl
                     BorderBrush="#333"
                     BorderThickness="1"
-                    ItemsSource="{Binding ProductLines}">
+                    ItemsSource="{Binding ProductLines}"
+                    VirtualizingPanel.CacheLengthUnit="Item"
+                    VirtualizingPanel.ScrollUnit="Pixel"
+                    VirtualizingPanel.VirtualizationMode="Recycling">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border
-                                Width="150"
-                                Height="150"
+                                Width="180"
+                                Height="180"
                                 Margin="4,4,12,4"
                                 BorderBrush="#333"
                                 BorderThickness="1"
                                 CornerRadius="4">
                                 <Grid>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
@@ -87,7 +91,18 @@
                                         </Style>
                                     </Grid.Resources>
 
-                                    <Image Grid.RowSpan="4" Source="{Binding ImageFullPath}">
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        Panel.ZIndex="999"
+                                        Command="{Binding RemoveItemCommand}"
+                                        Cursor="Hand">
+                                        <icons:PackIconFontAwesome Kind="TimesSolid" />
+                                    </Button>
+
+                                    <Image
+                                        Grid.RowSpan="5"
+                                        Panel.ZIndex="0"
+                                        Source="{Binding ImageFullPath}">
                                         <Image.InputBindings>
                                             <MouseBinding Command="{Binding ToggleCheckStateCommand, Mode=OneTime}" Gesture="LeftClick" />
                                         </Image.InputBindings>
@@ -105,9 +120,8 @@
                                         Panel.ZIndex="99"
                                         Text="{Binding Sku}" />
                                     <TextBox
-                                        Grid.Row="3"
+                                        Grid.Row="4"
                                         HorizontalAlignment="Stretch"
-                                        HorizontalContentAlignment="Right"
                                         Panel.ZIndex="99"
                                         FontSize="11"
                                         Text="{Binding Name}" />
@@ -122,7 +136,10 @@
                     </ItemsControl.ItemTemplate>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <vwp:VirtualizingWrapPanel Orientation="Vertical" SpacingMode="None" StretchItems="False"/>
+                            <vwp:VirtualizingWrapPanel
+                                Orientation="Vertical"
+                                SpacingMode="None"
+                                StretchItems="False" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </vwp:VirtualizingItemsControl>

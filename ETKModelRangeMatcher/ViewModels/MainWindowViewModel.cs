@@ -56,6 +56,7 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand LoadSourceCommand { get; }
     public ICommand CreateModelRangeCommand { get; }
     public ICommand SelectByPatternCommand { get; }
+    public ICommand GetModelRangesDescriptionCommand { get; }
 
     public ObservableCollection<ProductLine> IgnoredProducts { get; set; }
     public ObservableCollection<ProductLine> ProductLines { get; set; }
@@ -66,6 +67,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         LoadSourceCommand = new LambdaCommand(LoadProductLines);
         CreateModelRangeCommand = new LambdaCommand(CreateNewModelRange);
+        GetModelRangesDescriptionCommand = new LambdaCommand(GetModelRangesDescription);
         SelectByPatternCommand = new LambdaCommand(SelectByPattern, e => !string.IsNullOrWhiteSpace(SelectPattern));
         ProductLines = new ObservableCollection<ProductLine>();
         MatchedModelRanges = new ObservableCollection<MatchedModelRange>();
@@ -81,6 +83,23 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         ProductLines.CollectionChanged += ProductLines_CollectionChanged;
+    }
+
+    private void GetModelRangesDescription(object obj)
+    {
+        var dic = File.ReadAllLines("empty_mr_data.txt")
+            .Select(line => line.Split('\t'))
+            .ToDictionary(i => int.Parse(i[0]), i => i[1].Split(";").Select(pid => int.Parse(pid)).ToArray());
+        var productsData = File.ReadAllLines("adjacent_names.txt")
+            .Select(line => line.Split('\t'))
+            .Select(i => new ProductData() { ProductId = int.Parse(i[0]), Sku = i[1], Name = i[2] })
+            .ToArray();
+
+        var data = SqlBuilder.GetModelRangesDescriptions(dic, productsData);
+
+        Clipboard.SetText(data);
+
+        MessageBox.Show("SQL вставлен в буфер обмена");
     }
 
     private void ProductLines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
